@@ -9,9 +9,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet"
 import { DollarSign } from "lucide-react"
-import { DatePicker } from "@/components/ui/date-picker"
+import { BottomSheet } from "@/components/ui/bottom-sheet"
 
 const CATEGORIES = [
   "Rent",
@@ -49,7 +48,7 @@ export default function EditExpenseModal({ expense, open, onOpenChange, onUpdate
   const [amount, setAmount] = useState("")
   const [category, setCategory] = useState("")
   const [description, setDescription] = useState("")
-  const [date, setDate] = useState<Date | undefined>(undefined)
+  const [date, setDate] = useState("")
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -59,7 +58,7 @@ export default function EditExpenseModal({ expense, open, onOpenChange, onUpdate
       setAmount(expense.amount.toString())
       setCategory(expense.category)
       setDescription(expense.description)
-      setDate(new Date(expense.date))
+      setDate(expense.date)
     }
   }, [expense])
 
@@ -97,7 +96,7 @@ export default function EditExpenseModal({ expense, open, onOpenChange, onUpdate
         amount: Number(amount),
         category,
         description,
-        date: date.toISOString().split("T")[0],
+        date,
       }
 
       await onUpdate(updatedExpense)
@@ -110,70 +109,67 @@ export default function EditExpenseModal({ expense, open, onOpenChange, onUpdate
   }
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" className="h-[90vh] sm:h-[70vh] rounded-t-xl">
-        <SheetHeader className="mb-4">
-          <SheetTitle>Edit Expense</SheetTitle>
-        </SheetHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="edit-amount" className="flex items-center gap-1">
-              <DollarSign className="h-4 w-4" /> Amount
-            </Label>
-            <Input
-              id="edit-amount"
-              type="number"
-              step="0.01"
-              placeholder="0.00"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="text-lg"
-            />
-          </div>
+    <BottomSheet open={open} onOpenChange={onOpenChange} title="Edit Expense">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="edit-amount" className="flex items-center gap-1">
+            <DollarSign className="h-4 w-4" /> Amount
+          </Label>
+          <Input
+            id="edit-amount"
+            type="number"
+            step="0.01"
+            placeholder="0.00"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="text-lg"
+          />
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="edit-category">Category</Label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                {CATEGORIES.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {CATEGORY_ICONS[cat] || "📦"} {cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="edit-category">Category</Label>
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select category" />
+            </SelectTrigger>
+            <SelectContent>
+              {CATEGORIES.map((cat) => (
+                <SelectItem key={cat} value={cat}>
+                  {CATEGORY_ICONS[cat] || "📦"} {cat}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="edit-description">Description (optional)</Label>
-            <Textarea
-              id="edit-description"
-              placeholder="What was this expense for?"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="edit-description">Description (optional)</Label>
+          <Textarea
+            id="edit-description"
+            placeholder="What was this expense for?"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
 
-          <div className="space-y-2">
-            <Label>Date</Label>
-            <DatePicker date={date} onSelect={setDate} />
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="edit-date" className="flex items-center gap-1">
+            <DollarSign className="h-4 w-4" /> Date
+          </Label>
+          <Input id="edit-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
 
-          <SheetFooter className="mt-6">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="w-full">
-              Cancel
-            </Button>
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save Changes"}
-            </Button>
-          </SheetFooter>
-        </form>
-      </SheetContent>
-    </Sheet>
+        <div className="flex gap-2 mt-6">
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="w-full">
+            Cancel
+          </Button>
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
+      </form>
+    </BottomSheet>
   )
 }

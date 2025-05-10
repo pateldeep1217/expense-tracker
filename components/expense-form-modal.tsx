@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet"
-import { DollarSign, Calendar } from "lucide-react"
+import { DollarSign } from "lucide-react"
+import { DatePicker } from "@/components/ui/date-picker"
 
 const CATEGORIES = [
   "Rent",
@@ -49,16 +50,16 @@ export default function ExpenseFormModal({ open, onOpenChange, onAddExpense, sel
     const today = new Date()
     // If today is in the selected month, use today
     if (today.getMonth() === selectedDate.getMonth() && today.getFullYear() === selectedDate.getFullYear()) {
-      return today.toISOString().split("T")[0]
+      return today
     }
     // Otherwise use the 1st day of the selected month
-    return new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1).toISOString().split("T")[0]
+    return new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1)
   }
 
   const [amount, setAmount] = useState("")
   const [category, setCategory] = useState("")
   const [description, setDescription] = useState("")
-  const [date, setDate] = useState(getDefaultDate())
+  const [date, setDate] = useState<Date | undefined>(getDefaultDate())
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -103,7 +104,7 @@ export default function ExpenseFormModal({ open, onOpenChange, onAddExpense, sel
         amount: Number(amount),
         category,
         description,
-        date,
+        date: date.toISOString().split("T")[0],
       }
 
       // Add expense
@@ -178,10 +179,8 @@ export default function ExpenseFormModal({ open, onOpenChange, onAddExpense, sel
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="date" className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" /> Date
-            </Label>
-            <Input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            <Label>Date</Label>
+            <DatePicker date={date} onSelect={setDate} />
           </div>
 
           {error && <p className="text-red-500 text-sm">{error}</p>}

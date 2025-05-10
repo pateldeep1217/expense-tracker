@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet"
-import { DollarSign, Calendar } from "lucide-react"
+import { DollarSign } from "lucide-react"
+import { DatePicker } from "@/components/ui/date-picker"
 
 const CATEGORIES = [
   "Rent",
@@ -48,7 +49,7 @@ export default function EditExpenseModal({ expense, open, onOpenChange, onUpdate
   const [amount, setAmount] = useState("")
   const [category, setCategory] = useState("")
   const [description, setDescription] = useState("")
-  const [date, setDate] = useState("")
+  const [date, setDate] = useState<Date | undefined>(undefined)
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -58,7 +59,7 @@ export default function EditExpenseModal({ expense, open, onOpenChange, onUpdate
       setAmount(expense.amount.toString())
       setCategory(expense.category)
       setDescription(expense.description)
-      setDate(expense.date)
+      setDate(new Date(expense.date))
     }
   }, [expense])
 
@@ -96,7 +97,7 @@ export default function EditExpenseModal({ expense, open, onOpenChange, onUpdate
         amount: Number(amount),
         category,
         description,
-        date,
+        date: date.toISOString().split("T")[0],
       }
 
       await onUpdate(updatedExpense)
@@ -157,10 +158,8 @@ export default function EditExpenseModal({ expense, open, onOpenChange, onUpdate
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-date" className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" /> Date
-            </Label>
-            <Input id="edit-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            <Label>Date</Label>
+            <DatePicker date={date} onSelect={setDate} />
           </div>
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
